@@ -3,12 +3,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
 from static import style
+from manage_employees import ManageEmployees
+from view_charts import ViewCharts
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         size = (400,400)
-        self.setWindowTitle("Manage Employees")
+        self.setWindowTitle("Main Menu")
         self.setWindowIcon(QIcon("icons/icon.ico"))
         self.setGeometry(470, 200, 400,400)
         self.setStyleSheet(style.mainWindowStyle())
@@ -29,7 +31,7 @@ class MainWindow(QWidget):
         self.manageEmployeesBtn.clicked.connect(self.manageEmployee)
         self.manageEmployeesBtn.setStyleSheet(style.manageEmployeesBtnStyle())
         self.viewChartsBtn = QPushButton("View Charts")
-        self.viewChartsBtn.clicked.connect(self.viewCharts)
+        self.viewChartsBtn.clicked.connect(self.viewChartsAction)
         self.viewChartsBtn.setStyleSheet(style.viewChartsBtnStyle())
         self.emptyWidgetBottom = QLabel()
 
@@ -64,10 +66,11 @@ class MainWindow(QWidget):
         self.setLayout(self.mainLayout)
 
     def manageEmployee(self):
-        print("You clicked Manage Employees")
+        self.manageEmployees = ManageEmployees()
+        
 
-    def viewCharts(self):
-        print("You clicked View Charts")
+    def viewChartsAction(self):
+        self.viewCharts = ViewCharts()
 
 
 def main():
