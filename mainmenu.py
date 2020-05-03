@@ -14,7 +14,20 @@ class MainWindow(QMainWindow):
         self.show()
 
     def UI(self):
+        self.widgets()
+        self.layouts()
+
+    def widgets(self):
         pass
+
+    def layouts(self):
+        self.mainLayout         = QVBoxLayout()
+        self.topLayout          = QVBoxLayout()
+        self.middleUpLayout     = QVBoxLayout()
+        self.middleDownLayout   = QVBoxLayout()
+        self.bottomLayout     = QVBoxLayout()
+        self.topGroupBox        = QGroupBox()
+        self.bottomGroupBox   = QGroupBox()
 
 def main():
     App = QApplication(sys.argv)
