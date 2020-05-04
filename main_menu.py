@@ -6,6 +6,11 @@ from static import style
 from manage_employees import ManageEmployees
 from view_charts import ViewCharts
 
+import sqlite3
+
+con = sqlite3.connect("employees.db")
+cur = con.cursor()
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()

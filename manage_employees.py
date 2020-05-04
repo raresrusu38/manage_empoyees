@@ -4,20 +4,18 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets 
 from static import style
-import sqlite3
+from new_employee import NewEmployee
 
-con = sqlite3.connect("employees.db")
-cur = con.cursor()
 
 class ManageEmployees(QWidget):
     def __init__(self):
         super().__init__()
-        size = (400,400)
+        # size = (400,400)
         self.setWindowTitle("Manage Employees")
         self.setWindowIcon(QIcon("icons/icon.ico"))
         self.setGeometry(250, 100, 800,600)
         self.setStyleSheet(style.mainWindowStyle())
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
         self.UI()
         self.show()
 
@@ -39,17 +37,23 @@ class ManageEmployees(QWidget):
         ###################################################################################
         ###### Adding childMiddleUpLeftLayout widgets                 
         ###################################################################################
-        self.idLabel1        = QLabel("Id")
-        self.idEntry1        = QLineEdit()
-        self.firstNameLabel1 = QLabel("First Name")
-        self.firstNameEntry1 = QLineEdit()
+        self.idLabel            = QLabel("Id")
+        self.idEntry            = QLineEdit()
+        self.firstNameLabel     = QLabel("First Name")
+        self.firstNameEntry     = QLineEdit()
+        self.lastNameLabel      = QLabel("Last Name")
+        self.lastNameEntry      = QLineEdit()
+        self.birthdayLabel      = QLabel("Birthday")
+        self.birthdayEntry      = QLineEdit()
         ###################################################################################
-        ###### Adding childMiddleUpLeftLayout widgets                 
+        ###### Adding childMiddleUpRightLayout widgets                 
         ###################################################################################
-        self.idLabel2        = QLabel("Id")
-        self.idEntry2        = QLineEdit()
-        self.firstNameLabel2 = QLabel("First Name")
-        self.firstNameEntry2 = QLineEdit()
+        self.departmentLabel    = QLabel("Department Name")
+        self.departmentEntry    = QLineEdit()
+        self.salaryLabel        = QLabel("Salary")
+        self.salaryEntry        = QLineEdit()
+        self.positionLabel      = QLabel("Position")
+        self.positionEntry      = QLineEdit()
         ###################################################################################
         ###### Adding childHorizontalUpLayout widgets                 
         ###################################################################################
@@ -57,13 +61,6 @@ class ManageEmployees(QWidget):
         self.applyBtn.setStyleSheet(style.applyBtnStyle())
         self.resetBtn = QPushButton("Reset")
         self.resetBtn.setStyleSheet(style.resetBtnStyle())
-        ###################################################################################
-        ###### Adding middleDownLayout widgets                 
-        ###################################################################################
-        self.idLabel3        = QLabel("Id")
-        self.idEntry3        = QLineEdit()
-        self.firstNameLabel3 = QLabel("First Name")
-        self.firstNameEntry3 = QLineEdit()
         ###################################################################################
         ###### Adding middleTableLayout widgets                 
         ###################################################################################
@@ -81,6 +78,7 @@ class ManageEmployees(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(4,QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(5,QHeaderView.Stretch)
         ###################################################################################
         ###### Adding bottomLayout widgets         
         ###################################################################################
@@ -88,6 +86,7 @@ class ManageEmployees(QWidget):
         self.bottomBackBtn.setStyleSheet(style.bottomBackBtnStyle())
         self.bottomNewBtn = QPushButton("New")
         self.bottomNewBtn.setStyleSheet(style.bottomNewBtnStyle())
+        self.bottomNewBtn.clicked.connect(self.newEmployee)
         self.bottomExportBtn = QPushButton("Export")
         self.bottomExportBtn.setStyleSheet(style.bottomExportBtnStyle())
 
@@ -97,13 +96,14 @@ class ManageEmployees(QWidget):
         ###################################################################################
         self.mainLayout = QGridLayout()
         self.topLayout = QHBoxLayout()
+        
         self.parentMiddleUpLayout = QHBoxLayout()
 
         self.childMiddleUpLeftLayout = QFormLayout()
-        self.childMiddleUpCenterLayout = QFormLayout()
         self.childMiddleUpRightLayout = QFormLayout()
 
         self.middleDownLayout = QHBoxLayout()
+        self.middleDownLayout.setAlignment(Qt.AlignCenter)
         self.middleTableLayout = QHBoxLayout()
         self.bottomLayout = QHBoxLayout()
         ###################################################################################
@@ -118,28 +118,26 @@ class ManageEmployees(QWidget):
         ###### Add Widgets to Layouts                    
         ###################################################################################
         self.topLayout.addWidget(self.iconWidgetTop)
-        self.topLayout.setContentsMargins(0,2,730,2)
+        # self.topLayout.setContentsMargins(0,2,730,2)
+        self.topLayout.setAlignment(Qt.AlignLeft)
         ###################################################################################
         ### Setting Parent Layout                                 
         ###################################################################################
         self.parentMiddleUpLayout.addLayout(self.childMiddleUpLeftLayout)
-        self.parentMiddleUpLayout.addLayout(self.childMiddleUpCenterLayout)
         self.parentMiddleUpLayout.addLayout(self.childMiddleUpRightLayout)
         ###################################################################################
         ### Setting Child Left Layout                                 
         ###################################################################################
-        self.childMiddleUpLeftLayout.addRow(self.idLabel1, self.idEntry1)
-        self.childMiddleUpLeftLayout.addRow(self.firstNameLabel1, self.firstNameEntry1)
-        ###################################################################################
-        ### Setting Child Center Layout                                 
-        ###################################################################################
-        self.childMiddleUpCenterLayout.addRow(self.idLabel2, self.idEntry2)
-        self.childMiddleUpCenterLayout.addRow(self.firstNameLabel2, self.firstNameEntry2)
+        self.childMiddleUpLeftLayout.addRow(self.idLabel, self.idEntry)
+        self.childMiddleUpLeftLayout.addRow(self.firstNameLabel, self.firstNameEntry)
+        self.childMiddleUpLeftLayout.addRow(self.lastNameLabel, self.lastNameEntry)
+        self.childMiddleUpLeftLayout.addRow(self.birthdayLabel, self.birthdayEntry)
         ###################################################################################
         ### Setting Child Right Layout                                 
         ###################################################################################
-        self.childMiddleUpRightLayout.addRow(self.idLabel3, self.idEntry3)
-        self.childMiddleUpRightLayout.addRow(self.firstNameLabel3, self.firstNameEntry3)
+        self.childMiddleUpRightLayout.addRow(self.departmentLabel, self.departmentEntry)
+        self.childMiddleUpRightLayout.addRow(self.salaryLabel, self.salaryEntry)
+        self.childMiddleUpRightLayout.addRow(self.positionLabel, self.positionEntry)
         ###################################################################################
         ### Setting middleDown Layout                                 
         ###################################################################################
@@ -155,6 +153,7 @@ class ManageEmployees(QWidget):
         self.bottomLayout.addWidget(self.bottomBackBtn)
         self.bottomLayout.addWidget(self.bottomNewBtn)
         self.bottomLayout.addWidget(self.bottomExportBtn)
+        self.bottomLayout.setAlignment(Qt.AlignRight)
         ###################################################################################
         ### Setting MainLayout                                 
         ###################################################################################
@@ -162,6 +161,9 @@ class ManageEmployees(QWidget):
 
     def backToMainMenu(self):
        self.close()
+    
+    def newEmployee(self):
+        self.newEmployee = NewEmployee()
 
 
 
