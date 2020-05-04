@@ -7,7 +7,7 @@ def mainWindowStyle():
 def manageEmployeesBtnStyle():
     return """
         QPushButton {
-            background-color: #C93B9F;
+            background-color: #577e8a;
             color: #E7F4FF;
             font-size: 14px;
             font-weight: 600;
@@ -16,14 +16,14 @@ def manageEmployeesBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #ac3489;
+            background-color: #3f5f6a;
             color: #E7F4FF;
         }
     """
 def viewChartsBtnStyle():
     return """
         QPushButton {
-            background-color: #668AB9;
+            background-color: #7e5aa2;
             color: #E7F4FF;
             font-size: 14px;
             font-weight: 600;
@@ -32,7 +32,7 @@ def viewChartsBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #7985cb;
+            background-color: #5a3f70;
             color: #E7F4FF;
         }
     """
@@ -148,7 +148,7 @@ def saveBtnNewEmployee():
         font-size: 12px;
         font-weight: 600;
         width: 120px;
-        height: 30px;
+        height: 25px;
         border-radius: 4px;
         margin: 0 auto;
         text-align: center;
@@ -157,4 +157,74 @@ def saveBtnNewEmployee():
         background-color: #de7f2c;
         color: #E7F4FF;
     }
+    """
+### Salary - Position History Window ###
+def salaryLogLabelStyle():
+    return """
+        QLabel {
+            font-weight: 600;
+            font-size: 14px;
+        }
+    """
+def changeSalaryBtnStyle():
+    return """
+        QPushButton {
+            background-color: #496a75;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            width: 120px;
+            height: 25px;
+            border-radius: 4px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        QPushButton:hover {
+            background-color: #3f5f6a;
+            color: #E7F4FF;
+        }
+    """
+def positionLogLabelStyle():
+    return """
+        QLabel {
+            font-weight: 600;
+            font-size: 14px;
+        }
+    """
+def changePositionBtnStyle():
+    return """
+        QPushButton {
+            background-color: #496a75;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            width: 120px;
+            height: 25px;
+            border-radius: 4px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        QPushButton:hover {
+            background-color: #3f5f6a;
+            color: #E7F4FF;
+        }
+    """
+### Change Salary ###
+def saveBtnSalaryChangedStyle():
+    return """
+        QPushButton {
+            background-color: #496a75;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            width: 120px;
+            height: 25px;
+            border-radius: 4px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        QPushButton:hover {
+            background-color: #3f5f6a;
+            color: #E7F4FF;
+        }
     """
