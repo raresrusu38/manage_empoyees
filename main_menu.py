@@ -8,7 +8,7 @@ from view_charts import ViewCharts
 
 import sqlite3
 
-con = sqlite3.connect("employees.db")
+con = sqlite3.connect("database.db")
 cur = con.cursor()
 
 class MainWindow(QWidget):

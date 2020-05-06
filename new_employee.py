@@ -5,6 +5,11 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets 
 from static import style
 
+import sqlite3
+
+con = sqlite3.connect("database.db")
+cur = con.cursor()
+
 class NewEmployee(QWidget):
     def __init__(self):
         super().__init__()

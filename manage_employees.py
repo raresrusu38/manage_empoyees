@@ -6,6 +6,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from static import style
 from new_employee import NewEmployee
 
+import sqlite3
+
+con = sqlite3.connect("database.db")
+cur = con.cursor()
+
 
 class ManageEmployees(QWidget):
     def __init__(self):
@@ -22,6 +27,7 @@ class ManageEmployees(QWidget):
     def UI(self):
         self.widgets()
         self.layouts()
+        self.getEmployees()
 
     def widgets(self):
         ###################################################################################
@@ -67,7 +73,6 @@ class ManageEmployees(QWidget):
         self.table = QTableWidget()
         self.table.setStyleSheet(style.tableEmployeesStyle())
         self.table.setColumnCount(6)
-        # self.table.setColumnHidden(0, True)
         self.table.setHorizontalHeaderItem(0, QTableWidgetItem("Id"))
         self.table.setHorizontalHeaderItem(1, QTableWidgetItem("First Name"))
         self.table.setHorizontalHeaderItem(2, QTableWidgetItem("Last Name"))
@@ -165,6 +170,30 @@ class ManageEmployees(QWidget):
     
     def newEmployee(self):
         self.newEmployee = NewEmployee()
+
+    def getEmployees(self):
+        for i in reversed(range(self.table.rowCount())):
+            self.table.removeRow(i)
+
+            query = cur.execute(""" SELECT employee.id as ID, employee.first_name as "First Name", employee.last_name as "Last Name",
+                employee.birthday as "Birthday", employee.department_name as "Department Name", 
+                log_salary.salary as "Salary", log_position.position as "Position"
+                FROM employee, log_salary, log_position
+                WHERE employee.id = log_salary.employee_id AND employee.id = log_position.employee_id
+                AND log_salary.date = (SELECT max(date) FROM log_salary WHERE employee_id = employee.id)
+                AND log_position.date = (SELECT max(date) FROM log_position WHERE employee_id = employee.id)""")
+    
+            for row_data in query:
+                row_number = self.table.rowCount()
+                self.table.insertRow(row_number)
+                for column_number, data in enumerate(row_data):
+                    self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+            self.table.setEditTriggers(QAbstractItemWidget.NoEditTriggers)
+
+
+        
+
+    
 
 
 
