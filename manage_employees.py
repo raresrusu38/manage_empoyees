@@ -28,7 +28,7 @@ class ManageEmployees(QWidget):
         ###### Adding topLayout widgets                 
         ###################################################################################
         self.iconWidgetTop =  QPushButton("...")
-        self.iconWidgetTop.clicked.connect(self.backToMainMenu)
+        
         self.iconWidgetTop.setStyleSheet(style.iconWidgetTopStyle())
         ###################################################################################
         ###### Adding parentMiddleUpLayout widgets                 
@@ -83,6 +83,7 @@ class ManageEmployees(QWidget):
         ###### Adding bottomLayout widgets         
         ###################################################################################
         self.bottomBackBtn = QPushButton("Back")
+        self.bottomBackBtn.clicked.connect(self.backToMainMenu)
         self.bottomBackBtn.setStyleSheet(style.bottomBackBtnStyle())
         self.bottomNewBtn = QPushButton("New")
         self.bottomNewBtn.setStyleSheet(style.bottomNewBtnStyle())

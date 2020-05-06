@@ -8,12 +8,12 @@ from static import style
 class ViewCharts(QWidget):
     def __init__(self):
         super().__init__()
-        size = (400,400)
+        # size = (400,400)
         self.setWindowTitle("View Charts")
         self.setWindowIcon(QIcon("icons/icon.ico"))
         self.setGeometry(250, 100, 800,600)
         self.setStyleSheet(style.mainWindowStyle())
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
         self.UI()
         self.show()
 
@@ -23,26 +23,42 @@ class ViewCharts(QWidget):
 
     def widgets(self):
         ###################################################################################
-        ### Creating Widgets                    
+        ### Creating Widgets for centralLayout and bottomLayout               
         ###################################################################################
-        self.iconWidgetTop =  QPushButton("..Up")
-        self.iconWidgetTop.clicked.connect(self.backToMainMenu)
+        self.left = QListWidget()
+        self.right = QListWidget()
+        self.iconWidgetBtn =  QPushButton("Back")
+        self.iconWidgetBtn.setStyleSheet(style.iconWidgetBtnStyle())
+        self.iconWidgetBtn.clicked.connect(self.backToMainMenu)
 
     def layouts(self):
         ###################################################################################
         ### Creating Layouts                    
         ###################################################################################
         self.mainLayout = QGridLayout()
-        self.topLayout = QHBoxLayout()
+        self.centralLayout = QHBoxLayout()
+        self.leftLayout = QVBoxLayout()
+        self.rightLayout = QVBoxLayout()
+        self.bottomLayout = QHBoxLayout()
+        ###################################################################################
+        ### Adding ChildLayouts to centralLayout                                    
+        ###################################################################################
+        self.centralLayout.addLayout(self.leftLayout)
+        self.centralLayout.addLayout(self.rightLayout)   
         ###################################################################################
         ### Adding ChildLayouts to MainLayout                                    
         ###################################################################################
-        self.mainLayout.addLayout(self.topLayout,0,0)
+        self.mainLayout.addLayout(self.centralLayout,0,0)
+        self.mainLayout.addLayout(self.bottomLayout, 1,0)                         
         ###################################################################################
-        ###### Add Widgets to Layouts                    
+        ###### Add Widgets to leftLayout and rightLayout                    
         ###################################################################################
-        self.topLayout.addWidget(self.iconWidgetTop)
-        self.topLayout.setContentsMargins(0,2,700,2)
+        self.leftLayout.addWidget(self.left)
+        self.rightLayout.addWidget(self.right)
+        ###################################################################################
+        ###### Add Widgets to bottomLayout                    
+        ###################################################################################
+        self.bottomLayout.addWidget(self.iconWidgetBtn, alignment=Qt.AlignRight)
         ###################################################################################
         ### Setting MainLayout                                 
         ###################################################################################
