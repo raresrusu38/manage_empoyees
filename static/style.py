@@ -228,3 +228,21 @@ def saveBtnSalaryChangedStyle():
             color: #E7F4FF;
         }
     """
+def saveBtnPositionChangedStyle():
+    return """
+        QPushButton {
+            background-color: #496a75;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            width: 120px;
+            height: 25px;
+            border-radius: 4px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        QPushButton:hover {
+            background-color: #3f5f6a;
+            color: #E7F4FF;
+        } 
+    """
