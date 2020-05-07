@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent, QObject
 from PyQt5 import QtCore, QtGui, QtWidgets 
 from static import style
 from new_employee import NewEmployee
@@ -21,6 +21,7 @@ class ManageEmployees(QWidget):
         self.setGeometry(250, 100, 800,600)
         self.setStyleSheet(style.mainWindowStyle())
         # self.setFixedSize(self.size())
+
         self.UI()
         self.show()
 
@@ -72,18 +73,22 @@ class ManageEmployees(QWidget):
         ###################################################################################
         self.table = QTableWidget()
         self.table.setStyleSheet(style.tableEmployeesStyle())
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(7)
+        # self.table.setColumnHidden(0, True)
         self.table.setHorizontalHeaderItem(0, QTableWidgetItem("Id"))
         self.table.setHorizontalHeaderItem(1, QTableWidgetItem("First Name"))
         self.table.setHorizontalHeaderItem(2, QTableWidgetItem("Last Name"))
         self.table.setHorizontalHeaderItem(3, QTableWidgetItem("Birthday"))
         self.table.setHorizontalHeaderItem(4, QTableWidgetItem("Department"))
         self.table.setHorizontalHeaderItem(5, QTableWidgetItem("Salary"))
-        self.table.setHorizontalHeaderItem(5, QTableWidgetItem("Position"))
+        self.table.setHorizontalHeaderItem(6, QTableWidgetItem("Position"))
         self.table.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(4,QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(5,QHeaderView.Stretch)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.verticalHeader().hide()
+        self.table.doubleClicked.connect(self.selectedEmployee)
         ###################################################################################
         ###### Adding bottomLayout widgets         
         ###################################################################################
@@ -175,26 +180,303 @@ class ManageEmployees(QWidget):
         for i in reversed(range(self.table.rowCount())):
             self.table.removeRow(i)
 
-            query = cur.execute(""" SELECT employee.id as ID, employee.first_name as "First Name", employee.last_name as "Last Name",
-                employee.birthday as "Birthday", employee.department_name as "Department Name", 
-                log_salary.salary as "Salary", log_position.position as "Position"
-                FROM employee, log_salary, log_position
-                WHERE employee.id = log_salary.employee_id AND employee.id = log_position.employee_id
-                AND log_salary.date = (SELECT max(date) FROM log_salary WHERE employee_id = employee.id)
-                AND log_position.date = (SELECT max(date) FROM log_position WHERE employee_id = employee.id)""")
-    
-            for row_data in query:
-                row_number = self.table.rowCount()
-                self.table.insertRow(row_number)
-                for column_number, data in enumerate(row_data):
-                    self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
-            self.table.setEditTriggers(QAbstractItemWidget.NoEditTriggers)
+        query = (""" SELECT employee.id as ID, employee.first_name as "First Name", employee.last_name as "Last Name",
+            employee.birthday as "Birthday", employee.department_name as "Department Name", 
+            log_salary.salary as "Salary", log_position.position as "Position"
+            FROM employee, log_salary, log_position
+            WHERE employee.id = log_salary.employee_id AND employee.id = log_position.employee_id
+            AND log_salary.date = (SELECT max(date) FROM log_salary WHERE employee_id = employee.id)
+            AND log_position.date = (SELECT max(date) FROM log_position WHERE employee_id = employee.id)
+            """)
+        result = cur.execute(query)
 
+        for row_data in result:
+            row_number = self.table.rowCount()
+            self.table.insertRow(row_number)
 
+            for column_number, data in enumerate(row_data):
+                self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
         
-
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
+    def selectedEmployee(self):
+        global employeeId
+        listEmployee = []
+        for i in range(0,7):
+            listEmployee.append(self.table.item(self.table.currentRow(), i).text())
+        
+        employeeId = listEmployee[0]
+        self.salaryAndPosition = SalaryPosition()
+        self.salaryAndPosition.show()
+        
+### Salary - Position History Window ###
+class SalaryPosition(QWidget):
+    def __init__(self):
+        super().__init__()
+        # size = (400,400)
+        self.setWindowTitle("Salary - Position History")
+        self.setWindowIcon(QIcon("icons/icon.ico"))
+        self.setGeometry(250, 100, 800,600)
+        self.setStyleSheet(style.mainWindowStyle())
+        # self.setFixedSize(self.size())
+        self.UI()
+        self.show()
 
+    def UI(self):
+        self.widgets()
+        self.layouts()
+        self.getSalaryHistory()
+
+    def widgets(self):
+        ###################################################################################
+        ###### Adding LeftLayout widgets                 
+        ###################################################################################
+        self.salaryLogLabel = QLabel(" [ Salary Log ]")
+        self.salaryLogLabel.setAlignment(Qt.AlignCenter)
+        self.salaryLogLabel.setStyleSheet(style.salaryLogLabelStyle())
+        ###################################################################################
+        ###### Adding middleTableLayout widgets                 
+        ###################################################################################
+        self.tableSalary = QTableWidget()
+        self.tableSalary.setStyleSheet(style.tableEmployeesStyle())
+        self.tableSalary.setColumnCount(7)
+        self.tableSalary.setColumnHidden(0, True)
+        self.tableSalary.setHorizontalHeaderItem(0, QTableWidgetItem("Id"))
+        self.tableSalary.setHorizontalHeaderItem(1, QTableWidgetItem("First Name"))
+        self.tableSalary.setHorizontalHeaderItem(2, QTableWidgetItem("Last Name"))
+        self.tableSalary.setHorizontalHeaderItem(3, QTableWidgetItem("Department"))
+        self.tableSalary.setHorizontalHeaderItem(4, QTableWidgetItem("Salary"))
+        self.tableSalary.setHorizontalHeaderItem(5, QTableWidgetItem("Reason"))
+        self.tableSalary.setHorizontalHeaderItem(6, QTableWidgetItem("Date"))
+        self.tableSalary.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
+        self.tableSalary.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
+        self.tableSalary.horizontalHeader().setSectionResizeMode(3,QHeaderView.Stretch)
+        self.tableSalary.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableSalary.verticalHeader().hide()
+        ###################################################################################
+        ###### Adding bottomLeftLayout widgets                 
+        ###################################################################################
+        self.changeSalaryBtn = QPushButton("Change Salary")
+        self.changeSalaryBtn.setStyleSheet(style.changeSalaryBtnStyle())
+        self.changeSalaryBtn.clicked.connect(self.changeSalaryFunc)
+        ###################################################################################
+        ###### Adding RightLayout widgets                 
+        ###################################################################################
+        self.positionLogLabel = QLabel("[ Position Log ]")
+        self.positionLogLabel.setAlignment(Qt.AlignCenter)
+        self.positionLogLabel.setStyleSheet(style.positionLogLabelStyle())
+        ###################################################################################
+        ###### Adding middleTableLayout widgets                 
+        ###################################################################################
+        self.tablePosition = QTableWidget()
+        self.tablePosition.setStyleSheet(style.tableEmployeesStyle())
+        self.tablePosition.setColumnCount(6)
+        self.tablePosition.setColumnHidden(0, True)
+        self.tablePosition.setHorizontalHeaderItem(0, QTableWidgetItem("Id"))
+        self.tablePosition.setHorizontalHeaderItem(1, QTableWidgetItem("First Name"))
+        self.tablePosition.setHorizontalHeaderItem(2, QTableWidgetItem("Last Name"))
+        self.tablePosition.setHorizontalHeaderItem(3, QTableWidgetItem("Department"))
+        self.tablePosition.setHorizontalHeaderItem(4, QTableWidgetItem("Position"))
+        self.tablePosition.setHorizontalHeaderItem(5, QTableWidgetItem("Date"))
+        self.tablePosition.horizontalHeader().setSectionResizeMode(1,QHeaderView.Stretch)
+        self.tablePosition.horizontalHeader().setSectionResizeMode(2,QHeaderView.Stretch)
+        self.tablePosition.horizontalHeader().setSectionResizeMode(3,QHeaderView.Stretch)
+        self.tablePosition.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tablePosition.verticalHeader().hide()
+        ###################################################################################
+        ###### Adding bottomRightLayout widgets                 
+        ###################################################################################
+        self.changePositionBtn = QPushButton("Change Position")
+        self.changePositionBtn.setStyleSheet(style.changePositionBtnStyle())
+        self.changePositionBtn.clicked.connect(self.changePositionFunc)
+
+    def layouts(self):
+        ###################################################################################
+        ### Creating mainLayout                    
+        ###################################################################################
+        self.mainLayout     = QHBoxLayout()
+        ###################################################################################
+        ### Creating leftLayout                   
+        ###################################################################################
+        self.leftLayout     = QVBoxLayout()
+        self.leftTableLayout = QHBoxLayout()
+        self.leftBottomLayout = QVBoxLayout()
+        ###################################################################################
+        ### Creating rightLayout                    
+        ###################################################################################
+        self.rightLayout    = QVBoxLayout()
+        self.rightTableLayout = QHBoxLayout()
+        self.rightBottomLayout = QVBoxLayout()
+        ###################################################################################
+        ### Adding widgets to LeftLayout                                 
+        ###################################################################################
+        self.leftLayout.addWidget(self.salaryLogLabel)
+        self.leftLayout.addWidget(self.tableSalary)
+        self.leftLayout.addWidget(self.changeSalaryBtn)
+        ###################################################################################
+        ### Adding widgets to RightLayout                                 
+        ###################################################################################
+        self.rightLayout.addWidget(self.positionLogLabel)
+        self.rightLayout.addWidget(self.tablePosition)
+        self.rightLayout.addWidget(self.changePositionBtn)
+        ###################################################################################
+        ### Adding Layouts to leftLayout and rightLayout                                 
+        ###################################################################################
+        self.leftLayout.addLayout(self.leftTableLayout)
+        self.leftLayout.addLayout(self.leftBottomLayout)
+        self.rightLayout.addLayout(self.rightTableLayout)
+        self.rightLayout.addLayout(self.rightBottomLayout)
+        ###################################################################################
+        ### Adding Layouts to MainLayout                                 
+        ###################################################################################
+        self.mainLayout.addLayout(self.leftLayout)
+        self.mainLayout.addLayout(self.rightLayout)
+        ###################################################################################
+        ### Setting MainLayout                                 
+        ###################################################################################
+        self.setLayout(self.mainLayout)
+
+    def changeSalaryFunc(self):
+        self.changeSalary           = ChangeSalary()
+        # self.close()
+    
+    def changePositionFunc(self):
+        self.changePosition         = ChangePosition()
+        # self.close()
+    
+    def getSalaryHistory(self):
+        global employeeId
+
+class ChangeSalary(QWidget):
+    def __init__(self):
+        super().__init__()
+        # size = (400,400)
+        self.setWindowTitle("Change Salary")
+        self.setWindowIcon(QIcon("icons/icon.ico"))
+        self.setGeometry(250, 100, 350,400)
+        self.setStyleSheet(style.mainWindowStyle())
+        # self.setFixedSize(self.size())
+        self.UI()
+        self.show()
+
+    def UI(self):
+        self.widgets()
+        self.layouts()
+    
+    def widgets(self):
+        ###################################################################################
+        ###### Adding CentralLayout widgets                 
+        ###################################################################################
+        self.firstNameLabel = QLabel("First Name")
+        self.firstNameEntry = QLabel()
+        self.lastNameLabel = QLabel("Last Name")
+        self.lastNameEntry = QLabel()
+        self.currentSalaryLabel = QLabel("Current salary")
+        self.currentSalaryEntry = QLabel()
+        self.newSalaryLabel = QLabel("New salary")
+        self.newSalaryEntry = QLineEdit()
+        self.reasonLabel = QLabel("Reason")
+        self.reasonEntry = QLineEdit()
+        ###################################################################################
+        ###### Adding BottomLayout widget               
+        ###################################################################################
+        self.saveBtn = QPushButton("Save")
+        self.saveBtn.setStyleSheet(style.saveBtnSalaryChangedStyle())
+
+    def layouts(self):
+        ###################################################################################
+        ### Creating Layouts                    
+        ###################################################################################
+        self.mainLayout         = QVBoxLayout()
+        self.centralLayout      = QFormLayout()
+        self.bottomLayout       = QHBoxLayout()
+        ###################################################################################
+        ### Ading Widgets to centralLayout                   
+        ###################################################################################
+        self.centralLayout.addRow(self.firstNameLabel, self.firstNameEntry)
+        self.centralLayout.addRow(self.lastNameLabel, self.lastNameEntry)
+        self.centralLayout.addRow(self.currentSalaryLabel, self.currentSalaryEntry)
+        self.centralLayout.addRow(self.newSalaryLabel, self.newSalaryEntry)
+        self.centralLayout.addRow(self.reasonLabel, self.reasonEntry)
+        ###################################################################################
+        ### Ading Widgets to bottomLayout                   
+        ###################################################################################
+        self.bottomLayout.addWidget(self.saveBtn)
+        ###################################################################################
+        ### Ading Layouts to mainLayout                    
+        ###################################################################################
+        self.mainLayout.addLayout(self.centralLayout)
+        self.mainLayout.addLayout(self.bottomLayout)
+        ###################################################################################
+        ### Setting MainLayout                                 
+        ###################################################################################
+        self.setLayout(self.mainLayout)
+
+class ChangePosition(QWidget):
+    def __init__(self):
+        super().__init__()
+        # size = (400,400)
+        self.setWindowTitle("Change Position")
+        self.setWindowIcon(QIcon("icons/icon.ico"))
+        self.setGeometry(250, 100, 350,400)
+        self.setStyleSheet(style.mainWindowStyle())
+        # self.setFixedSize(self.size())
+        self.UI()
+        self.show()
+
+    def UI(self):
+        self.widgets()
+        self.layouts()
+    
+    def widgets(self):
+        ###################################################################################
+        ###### Adding CentralLayout widgets                 
+        ###################################################################################
+        self.firstNameLabel = QLabel("First Name")
+        self.firstNameEntry = QLabel()
+        self.lastNameLabel = QLabel("Last Name")
+        self.lastNameEntry = QLabel()
+        self.currentSalaryLabel = QLabel("Current salary")
+        self.currentSalaryEntry = QLabel()
+        self.currentPositionLabel = QLabel("Current Position")
+        self.currentPositionEntry = QLineEdit()
+        self.newPositionLabel = QLabel("New Position")
+        self.newPositionEntry = QLineEdit()
+        ###################################################################################
+        ###### Adding BottomLayout widget               
+        ###################################################################################
+        self.saveBtn = QPushButton("Save")
+        self.saveBtn.setStyleSheet(style.saveBtnPositionChangedStyle())
+
+    def layouts(self):
+        ###################################################################################
+        ### Creating Layouts                    
+        ###################################################################################
+        self.mainLayout         = QVBoxLayout()
+        self.centralLayout      = QFormLayout()
+        self.bottomLayout       = QHBoxLayout()
+        ###################################################################################
+        ### Ading Widgets to centralLayout                   
+        ###################################################################################
+        self.centralLayout.addRow(self.firstNameLabel, self.firstNameEntry)
+        self.centralLayout.addRow(self.lastNameLabel, self.lastNameEntry)
+        self.centralLayout.addRow(self.currentSalaryLabel, self.currentSalaryEntry)
+        self.centralLayout.addRow(self.currentPositionLabel, self.currentPositionEntry)
+        self.centralLayout.addRow(self.newPositionLabel, self.newPositionEntry)
+        ###################################################################################
+        ### Ading Widgets to bottomLayout                   
+        ###################################################################################
+        self.bottomLayout.addWidget(self.saveBtn)
+        ###################################################################################
+        ### Ading Layouts to mainLayout                    
+        ###################################################################################
+        self.mainLayout.addLayout(self.centralLayout)
+        self.mainLayout.addLayout(self.bottomLayout)
+        ###################################################################################
+        ### Setting MainLayout                                 
+        ###################################################################################
+        self.setLayout(self.mainLayout)
+    
 
 
 def main():
