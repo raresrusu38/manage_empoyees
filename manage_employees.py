@@ -226,6 +226,7 @@ class SalaryPosition(QWidget):
         self.widgets()
         self.layouts()
         self.getSalaryHistory()
+        self.getPositionHistory()
 
     def widgets(self):
         ###################################################################################
@@ -335,6 +336,49 @@ class SalaryPosition(QWidget):
         ### Setting MainLayout                                 
         ###################################################################################
         self.setLayout(self.mainLayout)
+    
+    def getSalaryHistory(self):
+        global employeeId
+        for i in reversed(range(self.tablePosition.rowCount())):
+            self.tableSalary.removeRow(i)
+
+        query = ("""
+            SELECT employee.id, employee.first_name, employee.last_name, employee.department_name, log_salary.salary, log_salary.reason, log_salary.date
+            FROM employee, log_salary
+            WHERE employee.id = log_salary.employee_id AND employee.id = ?
+
+        """)
+
+        result = cur.execute(query, (employeeId,))
+
+        for row_data in result:
+            row_number = self.tableSalary.rowCount()
+            self.tableSalary.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.tableSalary.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+       
+
+
+    def getPositionHistory(self):
+        global employeeId
+        for i in reversed(range(self.tablePosition.rowCount())):
+            self.tablePosition.removeRow(i)
+
+        query = ("""
+            SELECT employee.id, employee.first_name, employee.last_name, employee.department_name, log_position.position, log_position.date
+            FROM employee, log_position
+            WHERE employee.id = log_position.employee_id AND employee.id = ?
+
+        """)
+
+        result = cur.execute(query, (employeeId,))
+
+        for row_data in result:
+            row_number = self.tablePosition.rowCount()
+            self.tablePosition.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.tablePosition.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
     def changeSalaryFunc(self):
         self.changeSalary           = ChangeSalary()
@@ -343,9 +387,6 @@ class SalaryPosition(QWidget):
     def changePositionFunc(self):
         self.changePosition         = ChangePosition()
         # self.close()
-    
-    def getSalaryHistory(self):
-        global employeeId
 
 class ChangeSalary(QWidget):
     def __init__(self):
