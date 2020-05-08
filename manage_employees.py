@@ -357,9 +357,6 @@ class SalaryPosition(QWidget):
             for column_number, data in enumerate(row_data):
                 self.tableSalary.setItem(row_number, column_number, QTableWidgetItem(str(data)))
 
-       
-
-
     def getPositionHistory(self):
         global employeeId
         for i in reversed(range(self.tablePosition.rowCount())):
@@ -403,6 +400,7 @@ class ChangeSalary(QWidget):
     def UI(self):
         self.widgets()
         self.layouts()
+        self.populateChangeSalaryWindow()
     
     def widgets(self):
         ###################################################################################
@@ -416,6 +414,8 @@ class ChangeSalary(QWidget):
         self.currentSalaryEntry = QLabel()
         self.newSalaryLabel = QLabel("New salary")
         self.newSalaryEntry = QLineEdit()
+        self.dateLabel  = QLabel("Date")
+        self.dateEntry  = QLabel()
         self.reasonLabel = QLabel("Reason")
         self.reasonEntry = QLineEdit()
         ###################################################################################
@@ -423,6 +423,7 @@ class ChangeSalary(QWidget):
         ###################################################################################
         self.saveBtn = QPushButton("Save")
         self.saveBtn.setStyleSheet(style.saveBtnSalaryChangedStyle())
+        self.saveBtn.clicked.connect(self.saveChangeSalary)
 
     def layouts(self):
         ###################################################################################
@@ -438,6 +439,7 @@ class ChangeSalary(QWidget):
         self.centralLayout.addRow(self.lastNameLabel, self.lastNameEntry)
         self.centralLayout.addRow(self.currentSalaryLabel, self.currentSalaryEntry)
         self.centralLayout.addRow(self.newSalaryLabel, self.newSalaryEntry)
+        self.centralLayout.addRow(self.dateLabel, self.dateEntry)
         self.centralLayout.addRow(self.reasonLabel, self.reasonEntry)
         ###################################################################################
         ### Ading Widgets to bottomLayout                   
@@ -452,6 +454,47 @@ class ChangeSalary(QWidget):
         ### Setting MainLayout                                 
         ###################################################################################
         self.setLayout(self.mainLayout)
+
+    def populateChangeSalaryWindow(self):
+        global employeeId
+
+        query1 = ("SELECT employee.id, employee.first_name, employee.last_name FROM employee WHERE employee.id = ?")
+        employeeData = cur.execute(query1, (employeeId,)).fetchall()
+        employeeFirstName = employeeData[0][1]
+        employeeLastName = employeeData[0][2]
+        self.firstNameEntry.setText(employeeFirstName)
+        self.lastNameEntry.setText(employeeLastName)
+        
+        query2 = ("SELECT log_salary.employee_id, log_salary.salary, log_salary.date, log_salary.reason FROM log_salary WHERE log_salary.employee_id = ?")
+        employeeSalaryData = cur.execute(query2, (employeeId,)).fetchall()
+        employeeSalary = employeeSalaryData[0][1]
+        employeeDate = employeeSalaryData[0][2]
+        self.currentSalaryEntry.setText(str(employeeSalary))
+        self.dateEntry.setText(str(employeeDate))
+
+    def saveChangeSalary(self):
+        global employeeId
+
+        newSalary = self.newSalaryEntry.text()
+        date = self.dateEntry.text()
+        reason = self.reasonEntry.text()
+
+        if (newSalary and date and reason != ""):
+            
+            try:
+        
+                query = ("""INSERT INTO 'log_salary' (employee_id, salary, date, reason) VALUES (?,?,?,?)
+                """)
+                result = cur.execute(query, (employeeId, newSalary, date, reason))
+                print(result)
+                con.commit()
+                ### Display message to the user ###
+                QMessageBox.information(self, 'Info', 'Salary for this employee was changed')
+            except:
+                QMessageBox.information(self, 'Info', 'Salary for this employee was not changed')
+        else:
+            QMessageBox.information(self, 'Info', 'Fields cannot be empty')
+
 
 class ChangePosition(QWidget):
     def __init__(self):
