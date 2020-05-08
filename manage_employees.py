@@ -486,7 +486,6 @@ class ChangeSalary(QWidget):
                 query = ("""INSERT INTO 'log_salary' (employee_id, salary, date, reason) VALUES (?,?,?,?)
                 """)
                 result = cur.execute(query, (employeeId, newSalary, date, reason))
-                print(result)
                 con.commit()
                 ### Display message to the user ###
                 QMessageBox.information(self, 'Info', 'Salary for this employee was changed')
