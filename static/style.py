@@ -1,15 +1,15 @@
 ### Main Window ###
 def mainWindowStyle():
     return """
-        background-color:#00293D;
-        color: #71828f;
+        background-color:#021728;
+        color: #71CFF1;
         font-family: 'Open Sans';
     """
 def manageEmployeesBtnStyle():
     return """
         QPushButton {
-            background-color: #577e8a;
-            color: #E7F4FF;
+            background-color: #1779AC;
+            color: #fff;
             font-size: 14px;
             font-weight: 600;
             width: 100px;
@@ -17,15 +17,15 @@ def manageEmployeesBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #3f5f6a;
-            color: #E7F4FF;
+            background-color: #126692;
+            color: #fff;
         }
     """
 def viewChartsBtnStyle():
     return """
         QPushButton {
-            background-color: #7e5aa2;
-            color: #E7F4FF;
+            background-color: #02AD98;
+            color: #fff;
             font-size: 14px;
             font-weight: 600;
             width: 100px;
@@ -33,8 +33,8 @@ def viewChartsBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #5a3f70;
-            color: #E7F4FF;
+            background-color: #048c7c;
+            color: #fff;
         }
     """
 ### Manage Employees Window ###
@@ -57,7 +57,10 @@ def iconWidgetTopStyle():
 def tableEmployeesStyle():
     return """
         QTableWidget {
-
+            
+        }
+        QHeaderView::section {
+            background-color: #c64d02;
         }
     """
 def applyBtnStyle():
