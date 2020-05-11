@@ -40,18 +40,14 @@ def viewChartsBtnStyle():
 ### Manage Employees Window ###
 def iconWidgetTopStyle():
     return """
-        QPushButton {
-            background-color: #02AD98;
-            color: #E7F4FF;
-            font-size: 12px;
-            font-weight: 600;
-            width: 50px;
+        QToolButton {
+            background-color: #c64d02;
+            width: 20px;
             height: 20px;
             border-radius: 4px;
         }
-        QPushButton:hover {
-            background-color: #018075;
-            color: #E7F4FF;
+        QToolButton:hover {
+            background-color: #c64d02;
         }
     """
 def tableEmployeesStyle():

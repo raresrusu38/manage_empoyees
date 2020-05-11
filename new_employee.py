@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
-from PyQt5 import QtCore, QtGui, QtWidgets 
+from PyQt5 import QtCore, QtGui, QtWidgets
+from datetime import datetime
 from static import style
 
 import sqlite3
@@ -25,6 +26,7 @@ class NewEmployee(QWidget):
     def UI(self):
         self.widgets()
         self.layouts()
+        self.get_last_employee_id()
 
     def widgets(self):
         ###################################################################################
@@ -35,7 +37,7 @@ class NewEmployee(QWidget):
         self.lastNameLabel      = QLabel("Last Name")
         self.lastNameEntry      = QLineEdit()
         self.birthdayLabel      = QLabel("Birthday")
-        self.birthdayEntry      = QCalendarWidget()
+        self.birthdayEntry      = QtWidgets.QCalendarWidget()
         self.departmentLabel    = QLabel("Department")
         self.departmentEntry    = QLineEdit()
         self.salaryLabel        = QLabel("Salary")
@@ -45,6 +47,7 @@ class NewEmployee(QWidget):
         self.saveBtnLabel       = QLabel()
         self.saveBtn            = QPushButton("Save")
         self.saveBtn.setStyleSheet(style.saveBtnNewEmployee())
+        self.saveBtn.clicked.connect(self.addNewEmployee)
 
     def layouts(self):
         ###################################################################################
@@ -60,6 +63,7 @@ class NewEmployee(QWidget):
         self.centralLayout.addRow(self.lastNameLabel, self.lastNameEntry)
         self.centralLayout.addRow(self.birthdayLabel, self.birthdayEntry)
         self.centralLayout.addRow(self.departmentLabel, self.departmentEntry)
+        self.centralLayout.addRow(self.salaryLabel, self.salaryEntry)
         self.centralLayout.addRow(self.positionLabel, self.positionEntry)
         self.bottomLayout.addWidget(self.saveBtn)
         self.bottomLayout.setAlignment(Qt.AlignCenter)
@@ -72,6 +76,52 @@ class NewEmployee(QWidget):
         ### Setting MainLayout                                 
         ###################################################################################
         self.setLayout(self.mainLayout)
+
+    def get_last_employee_id(self):
+        query = ("SELECT max(id) FROM employee")
+        data = cur.execute(query).fetchone()
+        if data:
+            return data[0]
+        return 0
+
+    def addNewEmployee(self):
+        firstName = self.firstNameEntry.text()
+        lastName = self.lastNameEntry.text()
+        department = self.departmentEntry.text()
+        salary = self.salaryEntry.text()
+        position = self.positionEntry.text()
+
+        if (firstName and lastName and department and salary and position != ""):
+
+            try:
+                query1 = ("""
+                    INSERT INTO employee(first_name, last_name, birthday, department_name)
+                    VALUES(?,?,?,?)
+                """)
+                cur.execute(query1, (firstName, lastName, datetime.today().strftime('%Y-%m-%d'), department))
+                con.commit()
+
+                lastId = self.get_last_employee_id()
+                
+                query2 = ("""
+                    INSERT INTO log_salary(employee_id, salary, date)
+                    VALUES(?,?,?)
+                """)
+                cur.execute(query2, (lastId, salary, datetime.today().strftime('%Y-%m-%d')))
+                con.commit()
+
+                query3 = ("""
+                    INSERT INTO log_position(employee_id, position, date)
+                    VALUES(?,?,?)
+                """)
+                cur.execute(query3, (lastId, position, datetime.today().strftime('%Y-%m-%d')))
+                con.commit()
+
+                QMessageBox.information(self, 'Info', 'New employee was inserted')
+            except:
+                QMessageBox.information(self, 'Info', 'New employee was not inserted')
+        else:
+            QMessageBox.information(self, 'Info', 'Fields cannot be empty')
 
 
 def main():

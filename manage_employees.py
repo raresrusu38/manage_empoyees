@@ -35,13 +35,11 @@ class ManageEmployees(QWidget):
         ###################################################################################
         ###### Adding topLayout widgets                 
         ###################################################################################
-        self.iconWidgetTop =  QPushButton("...")
-        
+        self.iconWidgetTop =  QToolButton()
+        self.iconWidgetTop.setIcon(QIcon('icons/arrow_up.png'))
+        self.iconWidgetTop.setAutoRaise(True)
         self.iconWidgetTop.setStyleSheet(style.iconWidgetTopStyle())
-        ###################################################################################
-        ###### Adding parentMiddleUpLayout widgets                 
-        ###################################################################################
-        self.textForWidget = QLabel("MiddleLeftTopLayout")
+        self.iconWidgetTop.clicked.connect(self.search)
         ###################################################################################
         ###### Adding childMiddleUpLeftLayout widgets                 
         ###################################################################################
@@ -110,7 +108,6 @@ class ManageEmployees(QWidget):
         self.topLayout = QHBoxLayout()
         
         self.parentMiddleUpLayout = QHBoxLayout()
-
         self.childMiddleUpLeftLayout = QFormLayout()
         self.childMiddleUpRightLayout = QFormLayout()
 
@@ -189,6 +186,7 @@ class ManageEmployees(QWidget):
             AND log_salary.date = (SELECT max(date) FROM log_salary WHERE employee_id = employee.id)
             AND log_position.date = (SELECT max(date) FROM log_position WHERE employee_id = employee.id)
             """)
+
         result = cur.execute(query)
 
         for row_data in result:
@@ -209,6 +207,10 @@ class ManageEmployees(QWidget):
         employeeId = listEmployee[0]
         self.salaryAndPosition = SalaryPosition()
         self.salaryAndPosition.show()
+
+    def search(self):
+        pass
+
         
 ### Salary - Position History Window ###
 class SalaryPosition(QWidget):
