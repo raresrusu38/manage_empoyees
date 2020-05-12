@@ -1,7 +1,7 @@
 ### Main Window ###
 def mainWindowStyle():
     return """
-        background-color:#021728;
+        background-color:#2F343F;
         color: #71CFF1;
         font-family: 'Open Sans';
     """
@@ -24,7 +24,7 @@ def manageEmployeesBtnStyle():
 def viewChartsBtnStyle():
     return """
         QPushButton {
-            background-color: #02AD98;
+            background-color: #A9A100;
             color: #fff;
             font-size: 14px;
             font-weight: 600;
@@ -33,21 +33,41 @@ def viewChartsBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #048c7c;
+            background-color: #827c02;
             color: #fff;
         }
     """
 ### Manage Employees Window ###
-def iconWidgetTopStyle():
+def searchButtonStyle():
     return """
-        QToolButton {
-            background-color: #c64d02;
-            width: 20px;
+        QPushButton {
+            background-color: #02AD98;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 100px;
             height: 20px;
             border-radius: 4px;
         }
-        QToolButton:hover {
-            background-color: #c64d02;
+        QPushButton:hover {
+            background-color: #018075;
+            color: #E7F4FF;
+        }
+    """
+def resetButtonStyle():
+    return """
+        QPushButton {
+            background-color: #02AD98;
+            color: #E7F4FF;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 100px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        QPushButton:hover {
+            background-color: #018075;
+            color: #E7F4FF;
         }
     """
 def tableEmployeesStyle():
@@ -59,42 +79,10 @@ def tableEmployeesStyle():
             background-color: #c64d02;
         }
     """
-def applyBtnStyle():
-    return """
-        QPushButton {
-            background-color: #02AD98;
-            color: #E7F4FF;
-            font-size: 12px;
-            font-weight: 600;
-            max-width: 100px;
-            height: 20px;
-            border-radius: 4px;
-        }
-        QPushButton:hover {
-            background-color: #018075;
-            color: #E7F4FF;
-        }
-    """
-def resetBtnStyle():
-    return """
-        QPushButton {
-            background-color: #02AD98;
-            color: #E7F4FF;
-            font-size: 12px;
-            font-weight: 600;
-            max-width: 100px;
-            height: 20px;
-            border-radius: 4px;
-        }
-        QPushButton:hover {
-            background-color: #018075;
-            color: #E7F4FF;
-        }
-    """
 def bottomBackBtnStyle():
     return """
         QPushButton {
-            background-color: #02AD98;
+            background-color: #A9A100;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
@@ -103,14 +91,14 @@ def bottomBackBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #018075;
+            background-color: #827c02;
             color: #E7F4FF;
         }
     """
 def bottomNewBtnStyle():
     return """
         QPushButton {
-            background-color: #02AD98;
+            background-color:#dc6400;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
@@ -119,14 +107,14 @@ def bottomNewBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #018075;
+            background-color: #b95603;
             color: #E7F4FF;
         }
     """
 def bottomExportBtnStyle():
     return """
         QPushButton {
-            background-color: #02AD98;
+            background-color: #007736;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
@@ -135,7 +123,7 @@ def bottomExportBtnStyle():
             border-radius: 4px;
         }
         QPushButton:hover {
-            background-color: #018075;
+            background-color: #01672f;
             color: #E7F4FF;
         }
     """
@@ -143,18 +131,18 @@ def bottomExportBtnStyle():
 def saveBtnNewEmployee():
     return """
         QPushButton {
-        background-color: #ff9232;
+        background-color: #dc6400;
         color: #E7F4FF;
         font-size: 12px;
         font-weight: 600;
         width: 120px;
-        height: 25px;
+        height: 20px;
         border-radius: 4px;
         margin: 0 auto;
         text-align: center;
     }
     QPushButton:hover {
-        background-color: #de7f2c;
+        background-color: #b95603;
         color: #E7F4FF;
     }
     """

@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QEvent, QObject
@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from datetime import datetime
 from static import style
 from new_employee import NewEmployee
+import csv
 
 import sqlite3
 
@@ -35,38 +36,16 @@ class ManageEmployees(QWidget):
         ###################################################################################
         ###### Adding topLayout widgets                 
         ###################################################################################
-        self.iconWidgetTop =  QToolButton()
-        self.iconWidgetTop.setIcon(QIcon('icons/arrow_up.png'))
-        self.iconWidgetTop.setAutoRaise(True)
-        self.iconWidgetTop.setStyleSheet(style.iconWidgetTopStyle())
-        self.iconWidgetTop.clicked.connect(self.search)
-        ###################################################################################
-        ###### Adding childMiddleUpLeftLayout widgets                 
-        ###################################################################################
-        self.idLabel            = QLabel("Id")
-        self.idEntry            = QLineEdit()
-        self.firstNameLabel     = QLabel("First Name")
-        self.firstNameEntry     = QLineEdit()
-        self.lastNameLabel      = QLabel("Last Name")
-        self.lastNameEntry      = QLineEdit()
-        self.birthdayLabel      = QLabel("Birthday")
-        self.birthdayEntry      = QLineEdit()
-        ###################################################################################
-        ###### Adding childMiddleUpRightLayout widgets                 
-        ###################################################################################
-        self.departmentLabel    = QLabel("Department Name")
-        self.departmentEntry    = QLineEdit()
-        self.salaryLabel        = QLabel("Salary")
-        self.salaryEntry        = QLineEdit()
-        self.positionLabel      = QLabel("Position")
-        self.positionEntry      = QLineEdit()
-        ###################################################################################
-        ###### Adding childHorizontalUpLayout widgets                 
-        ###################################################################################
-        self.applyBtn = QPushButton("Apply")
-        self.applyBtn.setStyleSheet(style.applyBtnStyle())
-        self.resetBtn = QPushButton("Reset")
-        self.resetBtn.setStyleSheet(style.resetBtnStyle())
+        self.searchText = QLabel("Filter")
+        self.searchEntry = QLineEdit()
+        self.searchEntry.setPlaceholderText("Search for employee")
+        self.searchButton = QPushButton("Search")
+        self.searchButton.setStyleSheet(style.searchButtonStyle())
+        self.searchButton.clicked.connect(self.search)
+        self.resetButton = QPushButton("Reset")
+        self.resetButton.setStyleSheet(style.resetButtonStyle())
+        self.resetButton.clicked.connect(self.resetSearch)
+        self.resetButton.setToolTip('Clear search and refresh table data')
         ###################################################################################
         ###### Adding middleTableLayout widgets                 
         ###################################################################################
@@ -99,6 +78,7 @@ class ManageEmployees(QWidget):
         self.bottomNewBtn.clicked.connect(self.newEmployee)
         self.bottomExportBtn = QPushButton("Export")
         self.bottomExportBtn.setStyleSheet(style.bottomExportBtnStyle())
+        self.bottomExportBtn.clicked.connect(self.exportTableData)
 
     def layouts(self):
         ###################################################################################
@@ -106,52 +86,22 @@ class ManageEmployees(QWidget):
         ###################################################################################
         self.mainLayout = QGridLayout()
         self.topLayout = QHBoxLayout()
-        
-        self.parentMiddleUpLayout = QHBoxLayout()
-        self.childMiddleUpLeftLayout = QFormLayout()
-        self.childMiddleUpRightLayout = QFormLayout()
-
-        self.middleDownLayout = QHBoxLayout()
-        self.middleDownLayout.setAlignment(Qt.AlignCenter)
         self.middleTableLayout = QHBoxLayout()
         self.bottomLayout = QHBoxLayout()
         ###################################################################################
         ### Adding ChildLayouts to MainLayout                                    
         ###################################################################################
         self.mainLayout.addLayout(self.topLayout,0,0)
-        self.mainLayout.addLayout(self.parentMiddleUpLayout,1,0)
-        self.mainLayout.addLayout(self.middleDownLayout,2,0)
-        self.mainLayout.addLayout(self.middleTableLayout,3,0)
-        self.mainLayout.addLayout(self.bottomLayout,4,0)
+        self.mainLayout.addLayout(self.middleTableLayout,1,0)
+        self.mainLayout.addLayout(self.bottomLayout,2,0)
         ###################################################################################
         ###### Add Widgets to Layouts                    
         ###################################################################################
-        self.topLayout.addWidget(self.iconWidgetTop)
-        # self.topLayout.setContentsMargins(0,2,730,2)
-        self.topLayout.setAlignment(Qt.AlignLeft)
-        ###################################################################################
-        ### Setting Parent Layout                                 
-        ###################################################################################
-        self.parentMiddleUpLayout.addLayout(self.childMiddleUpLeftLayout)
-        self.parentMiddleUpLayout.addLayout(self.childMiddleUpRightLayout)
-        ###################################################################################
-        ### Setting Child Left Layout                                 
-        ###################################################################################
-        self.childMiddleUpLeftLayout.addRow(self.idLabel, self.idEntry)
-        self.childMiddleUpLeftLayout.addRow(self.firstNameLabel, self.firstNameEntry)
-        self.childMiddleUpLeftLayout.addRow(self.lastNameLabel, self.lastNameEntry)
-        self.childMiddleUpLeftLayout.addRow(self.birthdayLabel, self.birthdayEntry)
-        ###################################################################################
-        ### Setting Child Right Layout                                 
-        ###################################################################################
-        self.childMiddleUpRightLayout.addRow(self.departmentLabel, self.departmentEntry)
-        self.childMiddleUpRightLayout.addRow(self.salaryLabel, self.salaryEntry)
-        self.childMiddleUpRightLayout.addRow(self.positionLabel, self.positionEntry)
-        ###################################################################################
-        ### Setting middleDown Layout                                 
-        ###################################################################################
-        self.middleDownLayout.addWidget(self.applyBtn)
-        self.middleDownLayout.addWidget(self.resetBtn)
+        self.topLayout.addWidget(self.searchText)
+        self.topLayout.addWidget(self.searchEntry)
+        self.topLayout.addWidget(self.searchButton)
+        self.topLayout.addWidget(self.resetButton)
+        self.topLayout.setContentsMargins(0,20,0,20)
         ###################################################################################
         ### Setting middleTable Layout                                 
         ###################################################################################
@@ -209,9 +159,85 @@ class ManageEmployees(QWidget):
         self.salaryAndPosition.show()
 
     def search(self):
-        pass
+        value = self.searchEntry.text()
+        if value == "":
+            QMessageBox.information(self, "Warning","Search query cannot be empty")
+        else:
+            self.searchEntry.setText("")
+            
+            query = ("""
+                SELECT employee.id, employee.first_name, employee.last_name, employee.birthday, employee.department_name, log_salary.salary,log_position.position
+                FROM employee, log_salary, log_position
+                WHERE employee.id LIKE ? or employee.first_name LIKE ? or employee.last_name LIKE ? or employee.birthday LIKE ? or employee.department_name LIKE ? 
+                or log_salary.salary LIKE ? or log_position.position LIKE ?
+            """) 
+            results = cur.execute(query, ('%' + value + '%', '%' + value + '%', '%' + value + '%', '%' + value + '%' , '%' + value + '%', '%' + value + '%', '%' + value + '%')).fetchall()
 
+            if results == []:
+                QMessageBox.information(self, 'Warning', 'There is no such an employee')
+            else:
+                for i in reversed(range(self.table.rowCount())):
+                    self.table.removeRow(i)
+                
+                for row_data in results:
+                    row_number = self.table.rowCount()
+                    self.table.insertRow(row_number)
+                    for column_number, data in enumerate(row_data):
+                        self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+    def resetSearch(self):
+        self.searchEntry.clear()
+
+        for i in reversed(range(self.table.rowCount())):
+            self.table.removeRow(i)
+
+        query = (""" SELECT employee.id as ID, employee.first_name as "First Name", employee.last_name as "Last Name",
+            employee.birthday as "Birthday", employee.department_name as "Department Name", 
+            log_salary.salary as "Salary", log_position.position as "Position"
+            FROM employee, log_salary, log_position
+            WHERE employee.id = log_salary.employee_id AND employee.id = log_position.employee_id
+            AND log_salary.date = (SELECT max(date) FROM log_salary WHERE employee_id = employee.id)
+            AND log_position.date = (SELECT max(date) FROM log_position WHERE employee_id = employee.id)
+            """)
+
+        result = cur.execute(query)
+
+        for row_data in result:
+            row_number = self.table.rowCount()
+            self.table.insertRow(row_number)
+
+            for column_number, data in enumerate(row_data):
+                self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
         
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+    def exportTableData(self):
+        self.filename, ok = QFileDialog.getSaveFileName(self, "Save File","","CSV (*.csv *.xls)")
+
+        if ok:
+            path = os.path.basename(self.filename)
+            with open(str(path[0]),'w+', newline='') as stream:
+                writer = csv.writer(stream)
+                
+                ### write the header of the table
+                row_data = []
+                for col in range(self.table.columnCount()):
+                    row_data.append(self.table.horizontalHeaderItem(col).text())
+
+                writer.writerow(row_data)
+
+                for row in range(self.table.rowCount()):
+                    row_data = []
+
+                    for col in range(self.table.columnCount()):
+                        item = self.table.item(row, col)
+                        if item is not None:
+                            row_data.append(item.text())
+                        else:
+                            row_data.append('')
+                    writer.writerow(row_data)
+           
+
 ### Salary - Position History Window ###
 class SalaryPosition(QWidget):
     def __init__(self):
@@ -491,7 +517,7 @@ class ChangeSalary(QWidget):
         
                 query = ("""INSERT INTO 'log_salary' (employee_id, salary, date, reason) VALUES (?,?,?,?)
                 """)
-                result = cur.execute(query, (employeeId, newSalary, datetime.today().strftime('%Y-%m-%d'), reason))
+                result = cur.execute(query, (employeeId, newSalary, datetime.today().strftime('%Y-%m-%d %H:%M:%S'), reason))
                 con.commit()
                 ### Display message to the user ###
                 QMessageBox.information(self, 'Info', 'Salary for this employee was changed')
@@ -593,7 +619,7 @@ class ChangePosition(QWidget):
         
                 query = ("""INSERT INTO 'log_position' (employee_id, position, date) VALUES (?,?,?)
                 """)
-                result = cur.execute(query, (employeeId, newPosition, datetime.today().strftime('%Y-%m-%d')))
+                result = cur.execute(query, (employeeId, newPosition, datetime.today().strftime('%Y-%m-%d %H:%M:%S')))
                 con.commit()
                 ### Display message to the user ###
                 QMessageBox.information(self, 'Info', 'Position for this employee was changed')
