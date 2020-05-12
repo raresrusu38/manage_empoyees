@@ -25,36 +25,63 @@ class ViewCharts(QWidget):
         self.show()
 
     def UI(self):
-        self.create_bar()
+        self.get_salary_statistics()
         self.widgets()
         self.layouts()
         
-    def create_bar(self):
-        set0 = QBarSet("Rares")
-        set1 = QBarSet("Daniela")
-        set2 = QBarSet("Andrei")
+    def get_salary_statistics(self):
+        # set0 = QBarSet("Rares")
+        # set1 = QBarSet("Daniela")
+        # set2 = QBarSet("Andrei")
 
-        set0 << 1 << 2 << 3 << 4 << 5 << 6
-        set1 << 5 << 0 << 0 << 4 << 0 << 7
-        set2 << 3 << 5 << 8 << 13 << 8 << 5
+        result_list = [0,0,0]
 
-        series = QPercentBarSeries()
-        series.append(set0)
-        series.append(set1)
-        series.append(set2)
+        query = ("SELECT max(salary) FROM log_salary")
+        result = cur.execute(query,).fetchone()
+        if query:
+            result_list[2] = result[0]
 
-        self.chart = QChart()
-        self.chart.addSeries(series)
-        self.chart.setTitle("Percent BarChart")
-        self.chart.setAnimationOptions(QChart.SeriesAnimations)
+        query = ("SELECT avg(salary) FROM log_salary")
+        result = cur.execute(query,).fetchone()
+        if query:
+            result_list[1] = result[0]
 
-        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+        query = ("SELECT min(salary) FROM log_salary")
+        result = cur.execute(query,).fetchone()
+        if query:
+            result_list[0] = result[0]
+
+        print(result_list)
+
+        minBarSet = QBarSet("Min. Salary")
+        avgBarSet = QBarSet("Avg. Salary")
+        maxBarSet = QBarSet("Max. Salary")
+
+        # set0 << 1 << 2 << 3 << 4 << 5 << 6
+        # set1 << 5 << 0 << 0 << 4 << 0 << 7
+        # set2 << 3 << 5 << 8 << 13 << 8 << 5
+
+        minBarSet << result_list[0]
+        avgBarSet << result_list[1]
+        maxBarSet << result_list[2]
+
+        leftseries = QBarSeries()
+        leftseries.append(minBarSet)
+        leftseries.append(avgBarSet)
+        leftseries.append(maxBarSet)
+
+        self.leftchart = QChart()
+        self.leftchart.addSeries(leftseries)
+        self.leftchart.setTitle("Salary Statistics Chart")
+        self.leftchart.setAnimationOptions(QChart.SeriesAnimations)
+
+        # categories = ["1000", "2000", "3000", "4000", "5000", "6000"]
         axis = QBarCategoryAxis()
-        axis.append(categories)
-        self.chart.createDefaultAxes()
-        self.chart.setAxisX(axis, series)
+        axis.append('min:' + str(result_list[0]) + ' | ' + 'avg:' + str(result_list[1]) + ' | ' + 'max:' + str(result_list[2]))
+        self.leftchart.createDefaultAxes()
+        self.leftchart.setAxisX(axis, leftseries)
 
-        self.chartView = QChartView(self.chart)
+        self.chartView = QChartView(self.leftchart)
         self.chartView.setRenderHint(QPainter.Antialiasing)
 
     def widgets(self):
