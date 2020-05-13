@@ -26,14 +26,11 @@ class ViewCharts(QWidget):
 
     def UI(self):
         self.get_salary_statistics()
+        self.get_total_department_salaries()
         self.widgets()
         self.layouts()
         
     def get_salary_statistics(self):
-        # set0 = QBarSet("Rares")
-        # set1 = QBarSet("Daniela")
-        # set2 = QBarSet("Andrei")
-
         result_list = [0,0,0]
 
         query = ("SELECT max(salary) FROM log_salary")
@@ -51,15 +48,9 @@ class ViewCharts(QWidget):
         if query:
             result_list[0] = result[0]
 
-        print(result_list)
-
         minBarSet = QBarSet("Min. Salary")
         avgBarSet = QBarSet("Avg. Salary")
         maxBarSet = QBarSet("Max. Salary")
-
-        # set0 << 1 << 2 << 3 << 4 << 5 << 6
-        # set1 << 5 << 0 << 0 << 4 << 0 << 7
-        # set2 << 3 << 5 << 8 << 13 << 8 << 5
 
         minBarSet << result_list[0]
         avgBarSet << result_list[1]
@@ -81,15 +72,36 @@ class ViewCharts(QWidget):
         self.leftchart.createDefaultAxes()
         self.leftchart.setAxisX(axis, leftseries)
 
-        self.chartView = QChartView(self.leftchart)
-        self.chartView.setRenderHint(QPainter.Antialiasing)
+        self.leftchartView = QChartView(self.leftchart)
+        self.leftchartView.setRenderHint(QPainter.Antialiasing)
+
+    def get_total_department_salaries(self):
+        query = ("""
+            SELECT employee.department_name, SUM(log_salary.salary) 
+            FROM employee, log_salary 
+            WHERE log_salary.employee_id = employee.id
+            GROUP BY employee.department_name
+        """)
+        result = cur.execute(query,).fetchall()
+
+        rightseries = QPieSeries()
+       
+        for entry in result:
+            print(entry)
+        rightseries.append(entry[0], entry[1])
+
+        self.rightchart = QChart()
+        self.rightchart.addSeries(rightseries)
+        self.rightchart.setTitle("Total Salaries per department")
+        self.rightchart.setAnimationOptions(QChart.SeriesAnimations)
+
+        self.rightchartView = QChartView(self.rightchart)
+        self.rightchartView.setRenderHint(QPainter.Antialiasing)
 
     def widgets(self):
         ###################################################################################
         ### Creating Widgets for centralLayout and bottomLayout               
         ###################################################################################
-        # self.left = QListWidget()
-        self.right = QListWidget()
         self.iconWidgetBtn =  QPushButton("Back")
         self.iconWidgetBtn.setStyleSheet(style.iconWidgetBtnStyle())
         self.iconWidgetBtn.clicked.connect(self.backToMainMenu)
@@ -116,8 +128,8 @@ class ViewCharts(QWidget):
         ###################################################################################
         ###### Add Widgets to leftLayout and rightLayout                    
         ###################################################################################
-        self.leftLayout.addWidget(self.chartView)
-        self.rightLayout.addWidget(self.right)
+        self.leftLayout.addWidget(self.leftchartView)
+        self.rightLayout.addWidget(self.rightchartView)
         ###################################################################################
         ###### Add Widgets to bottomLayout                    
         ###################################################################################

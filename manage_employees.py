@@ -331,12 +331,14 @@ class SalaryPosition(QWidget):
         self.leftLayout     = QVBoxLayout()
         self.leftTableLayout = QHBoxLayout()
         self.leftBottomLayout = QVBoxLayout()
+        self.leftBottomLayout.setAlignment(Qt.AlignCenter)
         ###################################################################################
         ### Creating rightLayout                    
         ###################################################################################
         self.rightLayout    = QVBoxLayout()
         self.rightTableLayout = QHBoxLayout()
         self.rightBottomLayout = QVBoxLayout()
+        self.rightBottomLayout.setAlignment(Qt.AlignCenter)
         ###################################################################################
         ### Adding widgets to LeftLayout                                 
         ###################################################################################
@@ -466,6 +468,7 @@ class ChangeSalary(QWidget):
         self.mainLayout         = QVBoxLayout()
         self.centralLayout      = QFormLayout()
         self.bottomLayout       = QHBoxLayout()
+        self.bottomLayout.setAlignment(Qt.AlignCenter)
         ###################################################################################
         ### Ading Widgets to centralLayout                   
         ###################################################################################
@@ -571,6 +574,7 @@ class ChangePosition(QWidget):
         self.mainLayout         = QVBoxLayout()
         self.centralLayout      = QFormLayout()
         self.bottomLayout       = QHBoxLayout()
+        self.bottomLayout.setAlignment(Qt.AlignCenter)
         ###################################################################################
         ### Ading Widgets to centralLayout                   
         ###################################################################################

@@ -157,18 +157,18 @@ def salaryLogLabelStyle():
 def changeSalaryBtnStyle():
     return """
         QPushButton {
-            background-color: #496a75;
+            background-color: #A9A100;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
             width: 120px;
-            height: 25px;
+            height: 20px;
             border-radius: 4px;
             margin: 0 auto;
             text-align: center;
         }
         QPushButton:hover {
-            background-color: #3f5f6a;
+            background-color: #827c02;
             color: #E7F4FF;
         }
     """
@@ -182,18 +182,18 @@ def positionLogLabelStyle():
 def changePositionBtnStyle():
     return """
         QPushButton {
-            background-color: #496a75;
+            background-color: #A9A100;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
             width: 120px;
-            height: 25px;
+            height: 20px;
             border-radius: 4px;
             margin: 0 auto;
             text-align: center;
         }
         QPushButton:hover {
-            background-color: #3f5f6a;
+            background-color: #827c02;
             color: #E7F4FF;
         }
     """
@@ -201,18 +201,18 @@ def changePositionBtnStyle():
 def saveBtnSalaryChangedStyle():
     return """
         QPushButton {
-            background-color: #496a75;
+            background-color: #dc6400;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
             width: 120px;
-            height: 25px;
+            height: 20px;
             border-radius: 4px;
             margin: 0 auto;
             text-align: center;
         }
         QPushButton:hover {
-            background-color: #3f5f6a;
+            background-color: #b95603;
             color: #E7F4FF;
         }
     """
@@ -238,7 +238,7 @@ def saveBtnPositionChangedStyle():
 def iconWidgetBtnStyle():
     return """
         QPushButton {
-            background-color: #496a75;
+            background-color: #dc6400;
             color: #E7F4FF;
             font-size: 12px;
             font-weight: 600;
@@ -249,7 +249,7 @@ def iconWidgetBtnStyle():
             text-align: center;
         }
         QPushButton:hover {
-            background-color: #3f5f6a;
+            background-color: #b95603;
             color: #E7F4FF;
         } 
     """
