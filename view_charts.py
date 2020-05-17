@@ -142,12 +142,3 @@ class ViewCharts(QWidget):
     def backToMainMenu(self):
        self.close()
 
-
-
-def main():
-    App = QApplication(sys.argv)
-    window = ViewCharts()
-    sys.exit(App.exec_())
-
-if __name__ == '__main__':
-    main()

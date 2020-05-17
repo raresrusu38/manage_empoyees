@@ -122,12 +122,3 @@ class NewEmployee(QWidget):
                 QMessageBox.information(self, 'Info', 'New employee was not inserted')
         else:
             QMessageBox.information(self, 'Info', 'Fields cannot be empty')
-
-
-def main():
-    App = QApplication(sys.argv)
-    window = NewEmployee()
-    sys.exit(App.exec_())
-
-if __name__ == '__main__':
-    main()

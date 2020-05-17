@@ -632,13 +632,3 @@ class ChangePosition(QWidget):
         else:
             QMessageBox.information(self, 'Info', 'Fields cannot be empty')
 
-    
-
-
-def main():
-    App = QApplication(sys.argv)
-    window = ManageEmployees()
-    sys.exit(App.exec_())
-
-if __name__ == '__main__':
-    main()
